@@ -2,20 +2,24 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Fog
-  m_Shader: {fileID: 4800000, guid: 84c6eac4fb10ae24985badff6aa751f4, type: 3}
-  m_ShaderKeywords: 
+  m_Shader: {fileID: 4800000, guid: 6490db4c7a37d8349b85b261b7ff5cea, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -55,6 +59,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - CZY_FogColorStart4: 4
     - LightIntensity: 1
@@ -68,24 +73,24 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FlareSquish: 1
+    - _FlareSquish: 4.65
     - _FogColorStart1: 2
     - _FogColorStart2: 5
     - _FogColorStart3: 10
     - _FogColorStart4: 30
     - _FogDensity: 2
-    - _FogDepthMultiplier: 0.8
+    - _FogDepthMultiplier: 1.03
     - _FogDepthMultiplier1: 1
     - _FogIntensity: 1
     - _FogIntensity1: 1
-    - _FogOffset: 0.88
+    - _FogOffset: 0.85
     - _FogOffset1: 1
-    - _FogSmoothness: 1000000
+    - _FogSmoothness: 1819.3041
     - _FogSmoothness1: 100
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _LightFalloff: 4
+    - _LightFalloff: 23.784325
     - _LightFalloff1: 10
     - _LightIntensity: 1
     - _Metallic: 0
@@ -101,14 +106,14 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FogColor1: {r: 0, g: 0, b: 0, a: 0}
-    - _FogColor2: {r: 0, g: 0.1101449, b: 0.19999999, a: 0.1}
-    - _FogColor3: {r: 0, g: 0.27536225, b: 0.5, a: 0.45}
-    - _FogColor4: {r: 0, g: 0.38550714, b: 0.7, a: 0.75}
-    - _FogColor5: {r: 0.025943393, g: 0.6174527, b: 1.1, a: 1}
+    - _FogColor1: {r: 0, g: 0, b: 0, a: 0.007843138}
+    - _FogColor2: {r: 0.026426794, g: 0.20271845, b: 0.32274663, a: 0.13725491}
+    - _FogColor3: {r: 0.0647895, g: 0.2676826, b: 0.43445867, a: 0.5019608}
+    - _FogColor4: {r: 0.024136519, g: 0.25912198, b: 0.48408234, a: 0.75686276}
+    - _FogColor5: {r: 0.36276138, g: 0.62360185, b: 0.78054476, a: 1}
     - _FogSquish: {r: 1, g: 3.93, b: 0, a: 0}
-    - _LightColor: {r: 1.39772, g: 1.0685768, b: 0.65714806, a: 1}
+    - _LightColor: {r: 2.194308, g: 1.2816439, b: 1.2301812, a: 1}
     - _LightColor1: {r: 11.924528, g: 32, b: 29.818542, a: 0}
-    - _SunDirection: {r: -0.08280635, g: 0.9652842, b: 0.24772888, a: 0}
+    - _SunDirection: {r: -0.8052548, g: 0.31661826, b: -0.50131595, a: 0}
     - _SunDirection1: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

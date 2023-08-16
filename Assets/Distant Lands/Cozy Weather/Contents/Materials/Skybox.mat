@@ -2,20 +2,24 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Skybox
   m_Shader: {fileID: 4800000, guid: 2a61d1fe99ca7e74b986c801b0920c8d, type: 3}
-  m_ShaderKeywords: 
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -107,6 +111,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - LightIntensity1: 1
     - _AltocumulusMultiplier: 2
@@ -142,7 +147,7 @@ Material:
     - _Metallic: 0
     - _MinCloudCover: 0
     - _Mode: 0
-    - _MoonFlareFalloff: 25
+    - _MoonFlareFalloff: 26.9
     - _NimbusHeight: 1
     - _NimbusMultiplier: 1
     - _NimbusVariation: 1
@@ -155,14 +160,14 @@ Material:
     - _PatchworkHeight: 0.64
     - _PatchworkPower: 1
     - _PatchworkVariation: 0.13
-    - _Power: 0.5
+    - _Power: 0.638
     - _RainbowIntensity: 0
     - _RainbowSize: 16.8
     - _RainbowWidth: 24.3
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _SunFlareFalloff: 25
+    - _SunFlareFalloff: 90.9
     - _SunSize: 1
     - _TextureAmount: 1
     - _UVSec: 0
@@ -178,21 +183,21 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color0: {r: 0.4113119, g: 0.745283, b: 0.4412026, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GalaxyColor1: {r: 0, g: 0.5019608, b: 1, a: 1}
-    - _GalaxyColor2: {r: 0.11764706, g: 0.45490196, b: 0.078431375, a: 1}
-    - _GalaxyColor3: {r: 0.16470589, g: 0.078431375, b: 0.45490196, a: 1}
-    - _HorizonColor: {r: 0.4524226, g: 0.6942585, b: 0.8169812, a: 1}
+    - _GalaxyColor1: {r: 1, g: 0, b: 0.6574917, a: 1}
+    - _GalaxyColor2: {r: 0.4681289, g: 0.4470588, b: 1, a: 1}
+    - _GalaxyColor3: {r: 0, g: 0.84153175, b: 1, a: 1}
+    - _HorizonColor: {r: 0.05109688, g: 0.52571166, b: 0.8179713, a: 1}
     - _LightColor: {r: 0.35569295, g: 0.45956883, b: 0.4802988, a: 1}
     - _LightColor1: {r: 0.35427704, g: 0.5403362, b: 0.4741432, a: 1}
-    - _LightColumnColor: {r: 0, g: 0, b: 0, a: 1}
+    - _LightColumnColor: {r: 0, g: 0, b: 0, a: 0}
     - _MoonColor: {r: 0.11000357, g: 0.2264151, b: 0.22527522, a: 0}
     - _MoonDirection: {r: -0.640357, g: -0.766766, b: -0.04486454, a: 0}
-    - _MoonFlareColor: {r: 0, g: 0, b: 0, a: 0}
-    - _StarColor: {r: 0, g: 0, b: 0, a: 1}
+    - _MoonFlareColor: {r: 0.023529412, g: 0.08627451, b: 0.14901961, a: 1}
+    - _StarColor: {r: 0, g: 0, b: 0, a: 0}
     - _StormDirection: {r: 0, g: 0, b: 0, a: 0}
-    - _SunColor: {r: 1.49772, g: 1.278159, b: 1.0037078, a: 0}
+    - _SunColor: {r: 10, g: 10, b: 10, a: 0}
     - _SunColor1: {r: 10.43295, g: 10.43295, b: 10.43295, a: 0}
     - _SunDirection: {r: -0.05530402, g: -0.97433305, b: -0.21821257, a: 0}
-    - _SunFlareColor: {r: 1.29772, g: 1.1074783, b: 0.8696763, a: 0}
-    - _ZenithColor: {r: 0.253649, g: 0.561008, b: 0.7169812, a: 0}
+    - _SunFlareColor: {r: 0.57729673, g: 0.5448674, b: 0.4198108, a: 0}
+    - _ZenithColor: {r: 0.011664351, g: 0.1741979, b: 0.32425553, a: 1}
   m_BuildTextureStacks: []
