@@ -13,15 +13,18 @@ public class RockInteraction : MonoBehaviour
     private bool isHeld = false;
     private Vector3 offset;
     public float holdDistance = 2f;
+    public float moveSpeed = 2f; // Movement speed towards and away from the camera
     private Rigidbody rb;
 
     [Header("Rotation Controls")]
     public float rotisserieRotationSpeed = 20f;
     public float popShoveItRotationSpeed = 30f;
     private bool isFrozen = false;
+    private Vector3 originalPosition;
 
     void Start()
     {
+        originalPosition = transform.position;
         defaultShader = GetComponent<Renderer>().material.shader;
         mainCamera = Camera.main;
         rb = GetComponent<Rigidbody>();
@@ -69,10 +72,24 @@ public class RockInteraction : MonoBehaviour
         isHeld = true;
         offset = clickPosition - transform.position;
         rb.isKinematic = true;
+        rb.drag = 10;  // Adding drag to dampen forces while interacting
+        rb.angularDrag = 10;  // Dampen rotational forces too
     }
 
     void HandleHoldingLogic()
     {
+        float vertical = Input.GetAxis("Vertical");
+        Vector3 moveDirection = mainCamera.transform.forward;
+        transform.position += moveDirection * vertical * moveSpeed * Time.deltaTime; // Adjusted this line to move the rock towards and away from the camera.
+
+        float maxDistance = 5f;
+        Vector3 displacement = transform.position - originalPosition;
+
+        if (displacement.magnitude > maxDistance)
+        {
+            transform.position = originalPosition + displacement.normalized * maxDistance;
+        }
+
         if (Input.GetMouseButtonUp(0))
         {
             Release();
@@ -120,7 +137,13 @@ public class RockInteraction : MonoBehaviour
     {
         Camera.main.GetComponent<CameraController>().SetRockInteractionActive(false);
 
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
         isHeld = false;
         rb.isKinematic = false;
+
+        rb.drag = 0;  // Reset drag
+        rb.angularDrag = 0;  // Reset angular drag
     }
 }
