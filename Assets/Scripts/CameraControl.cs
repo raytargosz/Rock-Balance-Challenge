@@ -12,6 +12,9 @@ public class CameraController : MonoBehaviour
     private float currentMomentumDuration;
     private Vector3 lastMousePosition;
     private Vector3 currentRotationVelocity;
+    [Header("Keyboard Camera Movement")]
+    public float keyboardMovementSpeed = 5f;
+    public bool rockInteractionActive = false;  // Whether the rock is currently being interacted with.
 
     [Header("Camera Zoom Settings")]
     [Range(30, 120)] public float defaultFieldOfView = 60f;
@@ -41,9 +44,11 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-        HandleRotation();
-        HandleZoom();
-        HandleAudio();
+        if (!rockInteractionActive)
+        {
+            HandleRotation();
+            HandleZoom();
+        }
     }
 
     void HandleRotation()
@@ -126,5 +131,27 @@ public class CameraController : MonoBehaviour
             audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
             audioSource.PlayOneShot(clip);
         }
+    }
+
+    void HandleKeyboardMovement()
+    {
+        Vector3 movementDirection = new Vector3();
+
+        if (Input.GetKey(KeyCode.W))
+            movementDirection += transform.forward;
+        if (Input.GetKey(KeyCode.S))
+            movementDirection -= transform.forward;
+        if (Input.GetKey(KeyCode.A))
+            movementDirection -= transform.right;
+        if (Input.GetKey(KeyCode.D))
+            movementDirection += transform.right;
+
+        movementDirection.y = 0;  // Assuming you don't want the camera to move up/down with W/S.
+        transform.position += movementDirection.normalized * keyboardMovementSpeed * Time.deltaTime;
+    }
+
+    public void SetRockInteractionActive(bool state)
+    {
+        rockInteractionActive = state;
     }
 }

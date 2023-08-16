@@ -13166,6 +13166,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 178702, guid: 4a35e71f929fb994688db9ce77a9bf90, type: 3}
       insertIndex: -1
       addedObject: {fileID: 480692620}
+    - targetCorrespondingSourceObject: {fileID: 178702, guid: 4a35e71f929fb994688db9ce77a9bf90, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 480692624}
   m_SourcePrefab: {fileID: 100100000, guid: 4a35e71f929fb994688db9ce77a9bf90, type: 3}
 --- !u!4 &480692618 stripped
 Transform:
@@ -13204,6 +13207,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &480692624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 480692619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ab7168ed56d94245926649922e6e223, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineShader: {fileID: 0}
+  holdDistance: 2
+  rotisserieRotationSpeed: 60
+  popShoveItRotationSpeed: 60
 --- !u!1001 &483289239
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21678,6 +21697,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 119146, guid: 39f0ed697681ef1478f347abd260639a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 771844978}
+    - targetCorrespondingSourceObject: {fileID: 119146, guid: 39f0ed697681ef1478f347abd260639a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 771844982}
   m_SourcePrefab: {fileID: 100100000, guid: 39f0ed697681ef1478f347abd260639a, type: 3}
 --- !u!4 &771844976 stripped
 Transform:
@@ -21716,6 +21738,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &771844982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 771844977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ab7168ed56d94245926649922e6e223, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineShader: {fileID: 0}
+  holdDistance: 2
+  rotisserieRotationSpeed: 60
+  popShoveItRotationSpeed: 60
 --- !u!1001 &773361488
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -44980,6 +45018,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 153182, guid: b4f8a25dd3760bc4dae3d73a4700ea14, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1544977164}
+    - targetCorrespondingSourceObject: {fileID: 153182, guid: b4f8a25dd3760bc4dae3d73a4700ea14, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1544977168}
   m_SourcePrefab: {fileID: 100100000, guid: b4f8a25dd3760bc4dae3d73a4700ea14, type: 3}
 --- !u!4 &1544977162 stripped
 Transform:
@@ -45018,6 +45059,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1544977168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544977163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ab7168ed56d94245926649922e6e223, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineShader: {fileID: 0}
+  holdDistance: 2
+  rotisserieRotationSpeed: 60
+  popShoveItRotationSpeed: 60
 --- !u!1001 &1547587716
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -60131,6 +60188,8 @@ MonoBehaviour:
   rotationSpeed: 5
   dragSmoothing: 10
   momentumDuration: 2
+  keyboardMovementSpeed: 5
+  rockInteractionActive: 0
   defaultFieldOfView: 60
   minFieldOfView: 30
   maxFieldOfView: 90
@@ -63404,7 +63463,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 931431511}
-  - {fileID: 1909095731}
   - {fileID: 2093793084}
   - {fileID: 1111799629}
   - {fileID: 975907339}
@@ -63413,3 +63471,4 @@ SceneRoots:
   - {fileID: 132594530}
   - {fileID: 1770258112}
   - {fileID: 1424603032}
+  - {fileID: 1909095731}
