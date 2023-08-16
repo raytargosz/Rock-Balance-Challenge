@@ -1,38 +1,53 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraControl : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
-    [Header("Camera Settings")]
-    [Tooltip("Speed of camera rotation")]
-    public float rotationSpeed = 5f;
-    [Tooltip("Damping for camera rotation momentum")]
-    public float rotationDamping = 0.1f;
-
-    [Header("Reference")]
-    [Tooltip("Reference to the cylinder object")]
+    [Header("References")]
     public Transform cylinderTransform;
 
+    [Header("Camera Movement Settings")]
+    public float rotationSpeed = 3f;
+    public float dragSmoothing = 10f;
+    public float momentumDuration = 2f;
+    private float currentMomentumDuration;
     private Vector3 lastMousePosition;
-    private Vector3 currentVelocity;
+    private Vector3 currentRotationVelocity;
 
-    private void Start()
+    [Header("Camera Zoom Settings")]
+    [Range(30, 120)] public float defaultFieldOfView = 60f;
+    [Range(30, 120)] public float minFieldOfView = 30f;
+    [Range(30, 120)] public float maxFieldOfView = 90f;
+    public float zoomSpeed = 10f;
+    private float targetFieldOfView;
+
+    [Header("Sound Effects")]
+    public AudioClip zoomInSound;
+    public AudioClip zoomOutSound;
+    public AudioClip moveUpSound;
+    public AudioClip moveDownSound;
+    public AudioClip moveLeftSound;
+    public AudioClip moveRightSound;
+    public float soundCooldown = 0.5f;
+    private float zoomSoundCooldown;
+    private float moveSoundCooldown;
+    public Vector2 pitchRange = new Vector2(0.8f, 1.2f);
+    private AudioSource audioSource;
+
+    void Start()
     {
-        if (cylinderTransform == null)
-        {
-            Debug.LogError("Cylinder transform not assigned!");
-            return;
-        }
-
-        lastMousePosition = Input.mousePosition;
+        targetFieldOfView = defaultFieldOfView;
+        audioSource = GetComponent<AudioSource>();
     }
 
-    private void Update()
+    void Update()
     {
-        if (cylinderTransform == null)
-            return;
+        HandleRotation();
+        HandleZoom();
+        HandleAudio();
+    }
 
+    void HandleRotation()
+    {
         if (Input.GetMouseButtonDown(0))
         {
             lastMousePosition = Input.mousePosition;
@@ -40,23 +55,76 @@ public class CameraControl : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            Vector3 mouseDelta = Input.mousePosition - lastMousePosition;
-            float rotationX = -mouseDelta.y * rotationSpeed * Time.deltaTime;
-            float rotationY = mouseDelta.x * rotationSpeed * Time.deltaTime;
+            Vector3 deltaMousePos = Input.mousePosition - lastMousePosition;
 
-            Quaternion newRotation = Quaternion.Euler(rotationX, rotationY, 0f);
-            transform.parent.rotation *= newRotation;
+            float deltaYaw = deltaMousePos.x * rotationSpeed * Time.deltaTime;
+            float deltaPitch = -deltaMousePos.y * rotationSpeed * Time.deltaTime;
+
+            transform.RotateAround(cylinderTransform.position, Vector3.up, deltaYaw);
+            transform.RotateAround(cylinderTransform.position, transform.right, deltaPitch);
 
             lastMousePosition = Input.mousePosition;
-        }
-        else
-        {
-            // Apply momentum to the cylinder rotation
-            cylinderTransform.Rotate(Vector3.up, currentVelocity.x * Time.deltaTime);
-            cylinderTransform.Rotate(Vector3.right, currentVelocity.y * Time.deltaTime);
 
-            // Dampen the momentum over time
-            currentVelocity = Vector3.Lerp(currentVelocity, Vector3.zero, rotationDamping);
+            currentMomentumDuration = momentumDuration;
+            currentRotationVelocity = deltaMousePos;
+        }
+
+        // Apply momentum
+        if (currentMomentumDuration > 0)
+        {
+            transform.RotateAround(cylinderTransform.position, Vector3.up, currentRotationVelocity.x * rotationSpeed * Time.deltaTime);
+            transform.RotateAround(cylinderTransform.position, transform.right, -currentRotationVelocity.y * rotationSpeed * Time.deltaTime);
+            currentMomentumDuration -= Time.deltaTime;
+        }
+    }
+
+    void HandleZoom()
+    {
+        targetFieldOfView -= Input.mouseScrollDelta.y * zoomSpeed;
+        targetFieldOfView = Mathf.Clamp(targetFieldOfView, minFieldOfView, maxFieldOfView);
+
+        GetComponent<Camera>().fieldOfView = Mathf.Lerp(GetComponent<Camera>().fieldOfView, targetFieldOfView, dragSmoothing * Time.deltaTime);
+    }
+
+    void HandleAudio()
+    {
+        zoomSoundCooldown -= Time.deltaTime;
+        moveSoundCooldown -= Time.deltaTime;
+
+        // Play zoom sound
+        if (Input.mouseScrollDelta.y != 0 && zoomSoundCooldown <= 0)
+        {
+            AudioClip clip = Input.mouseScrollDelta.y > 0 ? zoomInSound : zoomOutSound;
+            PlaySound(clip);
+            zoomSoundCooldown = soundCooldown;
+        }
+
+        // Play movement sound
+        if (Input.GetMouseButton(0) && moveSoundCooldown <= 0)
+        {
+            Vector3 deltaMousePos = Input.mousePosition - lastMousePosition;
+
+            AudioClip clip = null;
+            if (Mathf.Abs(deltaMousePos.x) > Mathf.Abs(deltaMousePos.y))
+            {
+                clip = deltaMousePos.x > 0 ? moveRightSound : moveLeftSound;
+            }
+            else
+            {
+                clip = deltaMousePos.y > 0 ? moveUpSound : moveDownSound;
+            }
+
+            PlaySound(clip);
+            moveSoundCooldown = soundCooldown;
+        }
+    }
+
+    void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+            audioSource.PlayOneShot(clip);
         }
     }
 }

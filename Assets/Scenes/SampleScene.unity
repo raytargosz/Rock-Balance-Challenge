@@ -322,9 +322,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd20c722fd8b6e748b33a3796a8abd61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 5
-  rotationDamping: 0.1
   cylinderTransform: {fileID: 1080522806}
+  rotationSpeed: 0.5
+  dragSmoothing: 10
+  momentumDuration: 2
+  minPitchAngle: -120
+  maxPitchAngle: 120
+  defaultFieldOfView: 60
+  minFieldOfView: 30
+  maxFieldOfView: 90
+  zoomSpeed: 10
+  zoomInSound: {fileID: 0}
+  zoomOutSound: {fileID: 0}
+  moveUpSound: {fileID: 0}
+  moveDownSound: {fileID: 0}
+  moveLeftSound: {fileID: 0}
+  moveRightSound: {fileID: 0}
+  soundCooldown: 0.5
+  pitchRange: {x: 0.8, y: 1.2}
 --- !u!1 &1080522802
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,7 +352,6 @@ GameObject:
   - component: {fileID: 1080522805}
   - component: {fileID: 1080522804}
   - component: {fileID: 1080522803}
-  - component: {fileID: 1080522807}
   m_Layer: 0
   m_Name: Cylinder
   m_TagString: Untagged
@@ -362,7 +376,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5000001
   m_Height: 2
@@ -433,33 +447,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &1080522807
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1080522802}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &1237098375
 GameObject:
   m_ObjectHideFlags: 0
