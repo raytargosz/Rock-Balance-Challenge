@@ -3,22 +3,24 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     private Camera cam;
+    private AudioSource audioSource;
 
     [Header("References")]
     public Transform cylinderTransform;
 
-    [Header("Camera Movement Settings")]
+    [Header("Camera Rotation")]
     public float rotationSpeed = 3f;
     public float dragSmoothing = 10f;
     public float momentumDuration = 2f;
     private float currentMomentumDuration;
     private Vector3 lastMousePosition;
     private Vector3 currentRotationVelocity;
-    [Header("Keyboard Camera Movement")]
-    public float keyboardMovementSpeed = 5f;
-    public bool rockInteractionActive = false;  // Whether the rock is currently being interacted with.
 
-    [Header("Camera Zoom Settings")]
+    [Header("Keyboard Movement")]
+    public float keyboardMovementSpeed = 5f;
+    public bool rockInteractionActive = false;
+
+    [Header("Camera Zoom")]
     [Range(30, 120)] public float defaultFieldOfView = 60f;
     [Range(30, 120)] public float minFieldOfView = 30f;
     [Range(30, 120)] public float maxFieldOfView = 90f;
@@ -36,149 +38,156 @@ public class CameraController : MonoBehaviour
     private float zoomSoundCooldown;
     private float moveSoundCooldown;
     public Vector2 pitchRange = new Vector2(0.8f, 1.2f);
-    private AudioSource audioSource;
 
-    void Start()
+    private void Start()
+    {
+        InitializeComponents();
+    }
+
+    private void Update()
+    {
+        HandleAudio();
+        HandleKeyboardMovement();
+
+        if (rockInteractionActive)
+        {
+            HandleRockInteraction();
+        }
+        else
+        {
+            HandleRotation();
+            HandleZoom();
+        }
+    }
+
+    private void InitializeComponents()
     {
         cam = GetComponent<Camera>();
         targetFieldOfView = defaultFieldOfView;
         audioSource = GetComponent<AudioSource>();
     }
 
-    void Update()
+    private void HandleRockInteraction()
     {
-        HandleAudio();
-        HandleKeyboardMovement();
-
-        if (!rockInteractionActive)
-        {
-            HandleRotation();
-            HandleZoom();
-        }
-        else
-        {
-            RotateRock();
-            DropRock(); // New function for dropping the rock with the space key
-        }
+        RotateRock();
+        CheckForRockDrop();
     }
 
-    void RotateRock()
+    private void RotateRock()
     {
-        // Assuming the rock rotates around its local Y axis with the scroll wheel
         float rotationAmount = Input.mouseScrollDelta.y * rotationSpeed;
-        // Rotate the rock. You need to get a reference to the rock's transform.
-        // For the sake of this example, I'm rotating the cylinder.
         cylinderTransform.Rotate(0, rotationAmount, 0);
     }
 
-    void DropRock()
+    private void CheckForRockDrop()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            // Call a function from the rock's script to drop the rock.
-            // For this example, I'm setting rockInteractionActive to false.
             SetRockInteractionActive(false);
         }
     }
 
-    void HandleRotation()
+    private void HandleRotation()
     {
         if (Input.GetMouseButtonDown(0))
-        {
             lastMousePosition = Input.mousePosition;
-        }
 
         if (Input.GetMouseButton(0))
-        {
-            Vector3 deltaMousePos = Input.mousePosition - lastMousePosition;
+            RotateUsingMouse();
 
-            float deltaYaw = deltaMousePos.x * rotationSpeed * Time.deltaTime;
-            float deltaPitch = -deltaMousePos.y * rotationSpeed * Time.deltaTime;
-
-            transform.RotateAround(cylinderTransform.position, Vector3.up, deltaYaw);
-            transform.RotateAround(cylinderTransform.position, transform.right, deltaPitch);
-
-            lastMousePosition = Input.mousePosition;
-
-            currentMomentumDuration = momentumDuration;
-            currentRotationVelocity = deltaMousePos;
-        }
-
-        // Apply momentum
-        if (currentMomentumDuration > 0)
-        {
-            transform.RotateAround(cylinderTransform.position, Vector3.up, currentRotationVelocity.x * rotationSpeed * Time.deltaTime);
-            transform.RotateAround(cylinderTransform.position, transform.right, -currentRotationVelocity.y * rotationSpeed * Time.deltaTime);
-            currentMomentumDuration -= Time.deltaTime;
-        }
+        ApplyRotationMomentum();
     }
 
-    void HandleZoom()
+    private void RotateUsingMouse()
     {
-        if (rockInteractionActive) return; // Avoid zooming when interacting with the rock
+        Vector3 deltaMousePos = Input.mousePosition - lastMousePosition;
+        float deltaYaw = deltaMousePos.x * rotationSpeed * Time.deltaTime;
+        float deltaPitch = -deltaMousePos.y * rotationSpeed * Time.deltaTime;
+
+        transform.RotateAround(cylinderTransform.position, Vector3.up, deltaYaw);
+        transform.RotateAround(cylinderTransform.position, transform.right, deltaPitch);
+
+        lastMousePosition = Input.mousePosition;
+        currentMomentumDuration = momentumDuration;
+        currentRotationVelocity = deltaMousePos;
+    }
+
+    private void ApplyRotationMomentum()
+    {
+        if (currentMomentumDuration <= 0) return;
+
+        transform.RotateAround(cylinderTransform.position, Vector3.up, currentRotationVelocity.x * rotationSpeed * Time.deltaTime);
+        transform.RotateAround(cylinderTransform.position, transform.right, -currentRotationVelocity.y * rotationSpeed * Time.deltaTime);
+        currentMomentumDuration -= Time.deltaTime;
+    }
+
+    private void HandleZoom()
+    {
+        if (rockInteractionActive) return;
 
         targetFieldOfView -= Input.mouseScrollDelta.y * zoomSpeed;
         targetFieldOfView = Mathf.Clamp(targetFieldOfView, minFieldOfView, maxFieldOfView);
-
-        GetComponent<Camera>().fieldOfView = Mathf.Lerp(GetComponent<Camera>().fieldOfView, targetFieldOfView, dragSmoothing * Time.deltaTime);
+        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFieldOfView, dragSmoothing * Time.deltaTime);
     }
 
-    void HandleAudio()
+    private void HandleAudio()
     {
         zoomSoundCooldown -= Time.deltaTime;
         moveSoundCooldown -= Time.deltaTime;
 
-        // Play zoom sound
         if (Input.mouseScrollDelta.y != 0 && zoomSoundCooldown <= 0)
-        {
-            AudioClip clip = Input.mouseScrollDelta.y > 0 ? zoomInSound : zoomOutSound;
-            PlaySound(clip);
-            zoomSoundCooldown = soundCooldown;
-        }
+            PlayZoomSound();
 
-        // Play movement sound
         if (Input.GetMouseButton(0) && moveSoundCooldown <= 0)
-        {
-            Vector3 deltaMousePos = Input.mousePosition - lastMousePosition;
-
-            AudioClip clip = null;
-            if (Mathf.Abs(deltaMousePos.x) > Mathf.Abs(deltaMousePos.y))
-            {
-                clip = deltaMousePos.x > 0 ? moveRightSound : moveLeftSound;
-            }
-            else
-            {
-                clip = deltaMousePos.y > 0 ? moveUpSound : moveDownSound;
-            }
-
-            PlaySound(clip);
-            moveSoundCooldown = soundCooldown;
-        }
+            PlayMovementSound();
     }
 
-    void PlaySound(AudioClip clip)
+    private void PlayZoomSound()
     {
-        if (clip != null && audioSource != null)
-        {
-            audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
-            audioSource.PlayOneShot(clip);
-        }
+        AudioClip clip = Input.mouseScrollDelta.y > 0 ? zoomInSound : zoomOutSound;
+        PlaySound(clip);
+        zoomSoundCooldown = soundCooldown;
     }
 
-    void HandleKeyboardMovement()
+    private void PlayMovementSound()
+    {
+        Vector3 deltaMousePos = Input.mousePosition - lastMousePosition;
+        AudioClip clip;
+
+        if (Mathf.Abs(deltaMousePos.x) > Mathf.Abs(deltaMousePos.y))
+            clip = deltaMousePos.x > 0 ? moveRightSound : moveLeftSound;
+        else
+            clip = deltaMousePos.y > 0 ? moveUpSound : moveDownSound;
+
+        PlaySound(clip);
+        moveSoundCooldown = soundCooldown;
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip == null || audioSource == null) return;
+
+        audioSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+        audioSource.PlayOneShot(clip);
+    }
+
+    private void HandleKeyboardMovement()
     {
         Vector3 movementDirection = new Vector3();
 
         if (Input.GetKey(KeyCode.W))
             movementDirection += transform.forward;
+
         if (Input.GetKey(KeyCode.S))
             movementDirection -= transform.forward;
+
         if (Input.GetKey(KeyCode.A))
             movementDirection -= transform.right;
+
         if (Input.GetKey(KeyCode.D))
             movementDirection += transform.right;
 
-        movementDirection.y = 0;  // Assuming you don't want the camera to move up/down with W/S.
+        movementDirection.y = 0;
         transform.position += movementDirection.normalized * keyboardMovementSpeed * Time.deltaTime;
     }
 

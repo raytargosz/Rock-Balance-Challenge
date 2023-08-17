@@ -13223,7 +13223,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ab7168ed56d94245926649922e6e223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlineMaterial: {fileID: 0}
+  outlineMaterial: {fileID: 2100000, guid: f58cf65ea995c4b45be95713bdea8134, type: 2}
+  dropIndicatorPrefab: {fileID: 1784119767575136, guid: 3d103d65aaa62f34e8e9ad872c5735fb, type: 3}
   liftSpeed: 2
   moveSpeed: 2
   rotateSpeedAD: 30
@@ -13231,7 +13232,6 @@ MonoBehaviour:
   rockMass: 50
   groundedMass: 200
   groundedDrag: 10
-  dropIndicatorPrefab: {fileID: 1784119767575136, guid: 3d103d65aaa62f34e8e9ad872c5735fb, type: 3}
 --- !u!1001 &483289239
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21763,7 +21763,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ab7168ed56d94245926649922e6e223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlineMaterial: {fileID: 0}
+  outlineMaterial: {fileID: 2100000, guid: f58cf65ea995c4b45be95713bdea8134, type: 2}
+  dropIndicatorPrefab: {fileID: 1784119767575136, guid: 3d103d65aaa62f34e8e9ad872c5735fb, type: 3}
   liftSpeed: 2
   moveSpeed: 2
   rotateSpeedAD: 30
@@ -21771,7 +21772,6 @@ MonoBehaviour:
   rockMass: 50
   groundedMass: 200
   groundedDrag: 10
-  dropIndicatorPrefab: {fileID: 1784119767575136, guid: 3d103d65aaa62f34e8e9ad872c5735fb, type: 3}
 --- !u!1001 &773361488
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -45339,7 +45339,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ab7168ed56d94245926649922e6e223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlineMaterial: {fileID: 0}
+  outlineMaterial: {fileID: 2100000, guid: f58cf65ea995c4b45be95713bdea8134, type: 2}
+  dropIndicatorPrefab: {fileID: 1784119767575136, guid: 3d103d65aaa62f34e8e9ad872c5735fb, type: 3}
   liftSpeed: 2
   moveSpeed: 2
   rotateSpeedAD: 30
@@ -45347,7 +45348,6 @@ MonoBehaviour:
   rockMass: 50
   groundedMass: 200
   groundedDrag: 10
-  dropIndicatorPrefab: {fileID: 1784119767575136, guid: 3d103d65aaa62f34e8e9ad872c5735fb, type: 3}
 --- !u!1001 &1547587716
 PrefabInstance:
   m_ObjectHideFlags: 0
