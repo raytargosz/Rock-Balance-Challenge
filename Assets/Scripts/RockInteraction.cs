@@ -3,165 +3,133 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class RockInteraction : MonoBehaviour
 {
-    [Header("Highlighting")]
-    public Shader outlineShader;
-    private Shader defaultShader;
-    private bool isHighlighted = false;
-
-    [Header("Interaction")]
     private Camera mainCamera;
     private bool isHeld = false;
-    private Vector3 offset;
-    public float holdDistance = 2f;
-    public float moveSpeed = 2f; // Movement speed towards and away from the camera
     private Rigidbody rb;
-
-    [Header("Rotation Controls")]
-    public float rotisserieRotationSpeed = 20f;
-    public float popShoveItRotationSpeed = 30f;
-    private bool isFrozen = false;
     private Vector3 originalPosition;
+    private float distanceToCamera;
+    private Material originalMaterial;  // Store the original material
+    public Material outlineMaterial;    // Assign this in the inspector with your outlining shader material
 
-    [Header("Physics Properties")]
-    public float rockMass = 50f;          // Making the rock heavier
-    public float rockDrag = 4f;           // Higher drag makes it stop moving faster when released
-    public float rockAngularDrag = 2f;    // Higher angular drag makes it stop rotating faster when released
+    [Header("Interaction Settings")]
+    public float liftSpeed = 2f;
+    public float moveSpeed = 2f;
+    public float rotateSpeedAD = 30f;
+    public float rotateSpeedMouseWheel = 20f;
 
-    void Start()
+    [Header("Physics Settings")]
+    public float rockMass = 50f;
+    public float groundedMass = 200f;
+    public float groundedDrag = 10f;
+
+    [Header("Drop Indicator Settings")]
+    public GameObject dropIndicatorPrefab;
+    private GameObject dropIndicatorInstance;
+
+    private void Start()
     {
-        originalPosition = transform.position;
-        defaultShader = GetComponent<Renderer>().material.shader;
         mainCamera = Camera.main;
         rb = GetComponent<Rigidbody>();
+        originalPosition = transform.position;
+        rb.mass = rockMass;
 
-        rb.mass = rockMass;                // Set the mass of the rock
-        rb.drag = rockDrag;                // Set the drag of the rock
-        rb.angularDrag = rockAngularDrag;  // Set the angular drag of the rock
+        // Instantiate drop indicator
+        dropIndicatorInstance = Instantiate(dropIndicatorPrefab);
+        dropIndicatorInstance.SetActive(false);
+
+        originalMaterial = GetComponent<Renderer>().material;  // Store the original material
     }
 
-    void Update()
+    private void Update()
     {
-        CheckIfGrounded();
-
-        HandleHighlighting();
-
-        if (isHeld)
-        {
-            HandleHoldingLogic();
-        }
+        HoverOverRock();
+        HandleInteraction();
+        UpdateDropIndicator();
     }
 
-    void CheckIfGrounded()
+    private void HoverOverRock()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.1f))
-        {
-            if (!isHeld)  // If the rock is grounded and not held
-            {
-                rb.mass = 100;  // Increase the mass to make it harder to move
-                rb.drag = 10;   // Increase drag for more resistance
-            }
-        }
-        else
-        {
-            rb.mass = 1;  // Reset the mass to its original value
-            rb.drag = 0;  // Reset drag
-        }
-    }
-
-    void HandleHighlighting()
-    {
-        RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit) && hit.transform == this.transform)
         {
-            if (!isHighlighted)
+            // Change material to outline
+            GetComponent<Renderer>().material = outlineMaterial;
+
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                GetComponent<Renderer>().material.shader = outlineShader;
-                isHighlighted = true;
+                StartHolding();
             }
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                StartHolding(hit.point);
-            }
-        }
-        else if (isHighlighted)
-        {
-            GetComponent<Renderer>().material.shader = defaultShader;
-            isHighlighted = false;
-        }
-    }
-
-    void StartHolding(Vector3 clickPosition)
-    {
-        Camera.main.GetComponent<CameraController>().SetRockInteractionActive(true);
-
-        isHeld = true;
-        offset = clickPosition - transform.position;
-        rb.isKinematic = true;
-        rb.drag = 10;  // Adding drag to dampen forces while interacting
-        rb.angularDrag = 10;  // Dampen rotational forces too
-    }
-
-    void HandleHoldingLogic()
-    {
-        float verticalInput = Input.GetAxis("Vertical");
-        transform.position += mainCamera.transform.forward * verticalInput * moveSpeed * Time.deltaTime;
-
-        Vector3 mouseScreenPosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z);
-        Vector3 mouseWorldPosition = mainCamera.ScreenToWorldPoint(mouseScreenPosition);
-        transform.position = new Vector3(mouseWorldPosition.x - offset.x, mouseWorldPosition.y - offset.y, transform.position.z);
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            Release();
-            return;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ToggleFreezeRotation();
-        }
-
-        if (!isFrozen)
-        {
-            HandleRotationControls();
-        }
-    }
-
-    void ToggleFreezeRotation()
-    {
-        isFrozen = !isFrozen;
-        if (isFrozen)
-        {
-            rb.constraints = RigidbodyConstraints.FreezeRotation;
         }
         else
         {
-            rb.constraints = RigidbodyConstraints.None;
+            // Reset to original material
+            GetComponent<Renderer>().material = originalMaterial;
         }
     }
 
-    void HandleRotationControls()
+    private void HandleInteraction()
     {
-        float mouseWheel = Input.GetAxis("Mouse ScrollWheel");
-        transform.Rotate(Vector3.up * mouseWheel * rotisserieRotationSpeed * Time.deltaTime * 50); // Multiplied by 50 for a better sensitivity control using the mouse wheel
+        if (!isHeld) return;  // Only continue if the rock is held
 
-        float horizontal = Input.GetAxis("Horizontal");
-        transform.Rotate(Vector3.forward * horizontal * popShoveItRotationSpeed * Time.deltaTime);
+        // Movement (relative to camera's forward direction without affecting the Y-axis)
+        Vector3 newPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z));
+        transform.position = Vector3.Lerp(transform.position, new Vector3(newPosition.x, transform.position.y, newPosition.z), moveSpeed * Time.deltaTime);
+
+        // Rotation
+        float horizontal = Input.GetAxis("Horizontal"); // A and D for X axis rotation
+        float vertical = Input.GetAxis("Vertical"); // W and S for Z axis rotation (towards and away from camera)
+        float scroll = Input.GetAxis("Mouse ScrollWheel"); // Mouse scroll for Y axis rotation
+
+        transform.Rotate(Vector3.up, scroll * rotateSpeedMouseWheel * Time.deltaTime);
+        transform.Rotate(Vector3.right, horizontal * rotateSpeedAD * Time.deltaTime);
+        transform.position += vertical * moveSpeed * Time.deltaTime * mainCamera.transform.forward;
     }
 
-    void Release()
+    private void UpdateDropIndicator()
     {
-        Camera.main.GetComponent<CameraController>().SetRockInteractionActive(false);
+        if (!isHeld) return;
 
+        RaycastHit hitInfo;
+        if (Physics.Raycast(transform.position, -Vector3.up, out hitInfo))
+        {
+            dropIndicatorInstance.transform.position = hitInfo.point;
+            dropIndicatorInstance.transform.LookAt(mainCamera.transform.position);
+        }
+    }
+
+    private void StartHolding()
+    {
+        isHeld = true;
+        rb.isKinematic = true;
+        dropIndicatorInstance.SetActive(true);  // Assuming you want to show this as soon as the rock is held
+    }
+
+    private void ReleaseRock()
+    {
         isHeld = false;
         rb.isKinematic = false;
-
-        rb.drag = rockDrag;  // Set to default rock drag
-        rb.angularDrag = 0;  // Reset angular drag
+        dropIndicatorInstance.SetActive(false);
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isHeld) return;
+
+        // Increase mass and drag if rock is grounded to make it feel heavy
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            rb.mass = groundedMass;
+            rb.drag = groundedDrag;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Boundary"))
+        {
+            transform.position = originalPosition;
+        }
+    }
 }

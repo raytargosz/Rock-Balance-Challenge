@@ -44,7 +44,7 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-        if (!rockInteractionActive)
+        if (!rockInteractionActive) // Only move the camera if the rock is not being held
         {
             HandleRotation();
             HandleZoom();

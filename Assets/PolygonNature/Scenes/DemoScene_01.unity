@@ -12473,7 +12473,7 @@ GameObject:
   - component: {fileID: 452907900}
   m_Layer: 0
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 127
@@ -13223,14 +13223,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ab7168ed56d94245926649922e6e223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlineShader: {fileID: 0}
-  holdDistance: 0
+  outlineMaterial: {fileID: 0}
+  liftSpeed: 2
   moveSpeed: 2
-  rotisserieRotationSpeed: 200
-  popShoveItRotationSpeed: 200
+  rotateSpeedAD: 30
+  rotateSpeedMouseWheel: 20
   rockMass: 50
-  rockDrag: 0
-  rockAngularDrag: 1
+  groundedMass: 200
+  groundedDrag: 10
+  dropIndicatorPrefab: {fileID: 1784119767575136, guid: 3d103d65aaa62f34e8e9ad872c5735fb, type: 3}
 --- !u!1001 &483289239
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21762,14 +21763,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ab7168ed56d94245926649922e6e223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlineShader: {fileID: 0}
-  holdDistance: 0
+  outlineMaterial: {fileID: 0}
+  liftSpeed: 2
   moveSpeed: 2
-  rotisserieRotationSpeed: 200
-  popShoveItRotationSpeed: 200
+  rotateSpeedAD: 30
+  rotateSpeedMouseWheel: 20
   rockMass: 50
-  rockDrag: 0
-  rockAngularDrag: 1
+  groundedMass: 200
+  groundedDrag: 10
+  dropIndicatorPrefab: {fileID: 1784119767575136, guid: 3d103d65aaa62f34e8e9ad872c5735fb, type: 3}
 --- !u!1001 &773361488
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42619,8 +42621,8 @@ GameObject:
   - component: {fileID: 1441967904}
   - component: {fileID: 1441967908}
   m_Layer: 0
-  m_Name: Playable Area
-  m_TagString: Untagged
+  m_Name: Boundary
+  m_TagString: Boundary
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -45337,14 +45339,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ab7168ed56d94245926649922e6e223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlineShader: {fileID: 0}
-  holdDistance: 0
+  outlineMaterial: {fileID: 0}
+  liftSpeed: 2
   moveSpeed: 2
-  rotisserieRotationSpeed: 200
-  popShoveItRotationSpeed: 200
+  rotateSpeedAD: 30
+  rotateSpeedMouseWheel: 20
   rockMass: 50
-  rockDrag: 0
-  rockAngularDrag: 1
+  groundedMass: 200
+  groundedDrag: 10
+  dropIndicatorPrefab: {fileID: 1784119767575136, guid: 3d103d65aaa62f34e8e9ad872c5735fb, type: 3}
 --- !u!1001 &1547587716
 PrefabInstance:
   m_ObjectHideFlags: 0
