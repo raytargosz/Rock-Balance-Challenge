@@ -60461,6 +60461,7 @@ MonoBehaviour:
   rotationSpeed: 5
   dragSmoothing: 10
   momentumDuration: 2
+  maxDistanceFromCylinder: 5
   keyboardMovementSpeed: 5
   rockInteractionActive: 0
   defaultFieldOfView: 60

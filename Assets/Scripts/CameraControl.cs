@@ -16,6 +16,10 @@ public class CameraController : MonoBehaviour
     private Vector3 lastMousePosition;
     private Vector3 currentRotationVelocity;
 
+    [Header("Camera Movement Restrictions")]
+    public float maxDistanceFromCylinder = 10f;  // Maximum distance from the cylinder's center
+    public float minDistanceFromCylinder = 2f;   // Minimum distance from the cylinder's center
+
     [Header("Keyboard Movement")]
     public float keyboardMovementSpeed = 5f;
     public bool rockInteractionActive = false;
@@ -96,6 +100,9 @@ public class CameraController : MonoBehaviour
             RotateUsingMouse();
 
         ApplyRotationMomentum();
+
+        // Make sure the camera looks at the cylinder after rotating
+        transform.LookAt(cylinderTransform.position);
     }
 
     private void RotateUsingMouse()
@@ -177,18 +184,32 @@ public class CameraController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.W))
             movementDirection += transform.forward;
-
         if (Input.GetKey(KeyCode.S))
             movementDirection -= transform.forward;
-
         if (Input.GetKey(KeyCode.A))
             movementDirection -= transform.right;
-
         if (Input.GetKey(KeyCode.D))
             movementDirection += transform.right;
 
-        movementDirection.y = 0;
-        transform.position += movementDirection.normalized * keyboardMovementSpeed * Time.deltaTime;
+        movementDirection.y = 0;  // Assuming you don't want the camera to move up/down with W/S.
+
+        // Calculate the proposed new position
+        Vector3 proposedPosition = transform.position + movementDirection.normalized * keyboardMovementSpeed * Time.deltaTime;
+
+        // Check if the proposed new position is within the allowed distance range
+        float proposedDistance = Vector3.Distance(proposedPosition, cylinderTransform.position);
+        if (proposedDistance > maxDistanceFromCylinder || proposedDistance < minDistanceFromCylinder)
+        {
+            // If out of range, don't apply the proposed movement.
+            // This could be enhanced to allow partial movement or a more complex response.
+            return;
+        }
+
+        // If everything is okay, apply the movement
+        transform.position = proposedPosition;
+
+        // Ensure the camera looks at the cylinder after moving
+        transform.LookAt(cylinderTransform.position);
     }
 
     public void SetRockInteractionActive(bool state)
