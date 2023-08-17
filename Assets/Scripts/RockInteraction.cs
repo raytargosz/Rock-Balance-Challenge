@@ -20,6 +20,10 @@ public class RockInteraction : MonoBehaviour
     [Tooltip("Speed of rotation using the mouse wheel.")]
     public float rotateSpeedMouseWheel = 20f;
 
+    [Header("Camera Settings")]
+    [Tooltip("Speed of camera rotation around the rock using Q/E keys.")]
+    public float cameraRotationSpeed = 30f;  // Adjust the default value as needed
+
     [Header("Physics Settings")]
     [Tooltip("Mass of the rock when it's airborne.")]
     public float rockMass = 50f;
@@ -35,17 +39,106 @@ public class RockInteraction : MonoBehaviour
     private Material originalMaterial;
     private Vector3 originalPosition;
     private GameObject dropIndicatorInstance;
+    private bool isStonePicked = false;
 
     private void Start()
     {
         InitializeComponents();
     }
 
-    private void Update()
+    void Update()
     {
-        HoverOverRock();
-        HandleInteraction();
-        UpdateDropIndicator();
+        // Check for stone pickup/drop
+        if (Input.GetMouseButtonDown(0) && !isStonePicked && IsStoneUnderCursor())
+        {
+            StartHolding();
+            isStonePicked = true;
+        }
+        else if (Input.GetMouseButtonDown(1) && isStonePicked)
+        {
+            ReleaseRock();
+            isStonePicked = false;
+        }
+
+        if (isStonePicked)
+        {
+            HandleStoneMovement();
+            HandleStoneRotation();
+        }
+        else
+        {
+            HandleCameraRotation();
+        }
+    }
+
+    void HandleStoneMovement()
+    {
+        Vector3 movement = new Vector3(0, 0, 0);
+
+        if (Input.GetKey(KeyCode.W))
+        {
+            movement += Vector3.up; // Was previously Vector3.down
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            movement += Vector3.down; // Was previously Vector3.up
+        }
+        if (isHeld)
+        {
+            rb.isKinematic = true;
+        }
+
+        transform.Translate(movement * moveSpeed * Time.deltaTime);
+    }
+
+    void HandleStoneRotation()
+    {
+        float rotationAmountAD = rotateSpeedAD * Time.deltaTime;
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            transform.Rotate(0, -rotationAmountAD, 0, Space.World);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            transform.Rotate(0, rotationAmountAD, 0, Space.World);
+        }
+
+        float mouseWheel = Input.GetAxis("Mouse ScrollWheel");
+        if (isStonePicked)
+        {
+            transform.Rotate(mouseWheel * rotateSpeedMouseWheel, 0, 0, Space.World);
+        }
+    }
+
+    private bool IsStoneUnderCursor()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            // Check if the hit object is the stone
+            if (hit.transform == this.transform)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    void HandleCameraRotation()
+    {
+        if (Input.GetKey(KeyCode.Q))
+        {
+            Camera.main.transform.RotateAround(transform.position, Vector3.up, -cameraRotationSpeed * Time.deltaTime);
+        }
+        else if (Input.GetKey(KeyCode.E))
+        {
+            Camera.main.transform.RotateAround(transform.position, Vector3.up, cameraRotationSpeed * Time.deltaTime);
+        }
     }
 
     private void InitializeComponents()
@@ -125,13 +218,14 @@ public class RockInteraction : MonoBehaviour
 
         transform.Rotate(Vector3.up, scrollRotation * rotateSpeedMouseWheel * Time.deltaTime);
         transform.Rotate(Vector3.right, horizontalRotation * rotateSpeedAD * Time.deltaTime);
-        transform.Rotate(Vector3.forward, verticalRotation * rotateSpeedMouseWheel * Time.deltaTime);
+        transform.Rotate(Vector3.forward, verticalRotation * rotateSpeedMouseWheel * Time.deltaTime); 
     }
 
     private void StartHolding()
     {
         isHeld = true;
         rb.isKinematic = true;
+        rb.mass = rockMass;
         dropIndicatorInstance.SetActive(true);
     }
 
