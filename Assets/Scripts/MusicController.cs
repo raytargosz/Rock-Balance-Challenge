@@ -2,7 +2,6 @@ using System.Collections;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class MusicController : MonoBehaviour
 {
@@ -22,6 +21,10 @@ public class MusicController : MonoBehaviour
     [Header("Music Settings")]
     [Tooltip("List of tracks with their titles and artists.")]
     public TrackInfo[] tracks;
+
+    [Range(0.1f, 1f)]
+    [Tooltip("Maximum volume for the music playback.")]
+    public float maxVolume = 1f;
 
     [Range(0.1f, 5f)]
     [Tooltip("Duration for fade in and fade out transitions.")]
@@ -84,7 +87,7 @@ public class MusicController : MonoBehaviour
         audioSource.Play();
 
         float startVolume = 0;
-        float endVolume = 1;
+        float endVolume = maxVolume; // Ensure the music doesn't go above maxVolume.
         float elapsedTime = 0;
 
         while (elapsedTime < fadeDuration)
@@ -98,7 +101,7 @@ public class MusicController : MonoBehaviour
 
         // Fade out.
         elapsedTime = 0;
-        startVolume = 1;
+        startVolume = maxVolume;  // Starting from maxVolume.
         endVolume = 0;
 
         while (elapsedTime < fadeDuration)
