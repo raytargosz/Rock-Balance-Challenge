@@ -8,6 +8,7 @@ public class RockInteraction : MonoBehaviour
     private Rigidbody rb;
     private Vector3 originalPosition;
     private float distanceToCamera;
+    private Renderer rockRenderer;
     private Material originalMaterial;  // Store the original material
     public Material outlineMaterial;    // Assign this in the inspector with your outlining shader material
 
@@ -28,6 +29,7 @@ public class RockInteraction : MonoBehaviour
 
     private void Start()
     {
+        rockRenderer = GetComponent<Renderer>();
         mainCamera = Camera.main;
         rb = GetComponent<Rigidbody>();
         originalPosition = transform.position;
@@ -59,7 +61,10 @@ public class RockInteraction : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                StartHolding();
+                if (isHeld)
+                    ReleaseRock();
+                else
+                    StartHolding();
             }
         }
         else
@@ -71,20 +76,24 @@ public class RockInteraction : MonoBehaviour
 
     private void HandleInteraction()
     {
-        if (!isHeld) return;  // Only continue if the rock is held
+        if (!isHeld) return;
 
-        // Movement (relative to camera's forward direction without affecting the Y-axis)
-        Vector3 newPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, mainCamera.WorldToScreenPoint(transform.position).z));
-        transform.position = Vector3.Lerp(transform.position, new Vector3(newPosition.x, transform.position.y, newPosition.z), moveSpeed * Time.deltaTime);
+        // Movement (relative to world's direction)
+        float moveX = Input.GetAxis("Mouse X");
+        float moveY = Input.GetAxis("Mouse Y");
+        Vector3 newPos = transform.position + new Vector3(moveX, moveY, 0) * moveSpeed * Time.deltaTime;
+
+        if (!Physics.Raycast(newPos, Vector3.down, 0.5f)) // Assuming 0.5f as half the height of the rock
+            transform.position = newPos;
 
         // Rotation
         float horizontal = Input.GetAxis("Horizontal"); // A and D for X axis rotation
-        float vertical = Input.GetAxis("Vertical"); // W and S for Z axis rotation (towards and away from camera)
+        float vertical = Input.GetAxis("Vertical"); // W and S for Z axis rotation (towards and away from the camera)
         float scroll = Input.GetAxis("Mouse ScrollWheel"); // Mouse scroll for Y axis rotation
 
         transform.Rotate(Vector3.up, scroll * rotateSpeedMouseWheel * Time.deltaTime);
         transform.Rotate(Vector3.right, horizontal * rotateSpeedAD * Time.deltaTime);
-        transform.position += vertical * moveSpeed * Time.deltaTime * mainCamera.transform.forward;
+        transform.Rotate(Vector3.forward, vertical * rotateSpeedMouseWheel * Time.deltaTime);
     }
 
     private void UpdateDropIndicator()

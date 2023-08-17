@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    private Camera cam;
+
     [Header("References")]
     public Transform cylinderTransform;
 
@@ -38,16 +40,44 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
+        cam = GetComponent<Camera>();
         targetFieldOfView = defaultFieldOfView;
         audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
-        if (!rockInteractionActive) // Only move the camera if the rock is not being held
+        HandleAudio();
+        HandleKeyboardMovement();
+
+        if (!rockInteractionActive)
         {
             HandleRotation();
             HandleZoom();
+        }
+        else
+        {
+            RotateRock();
+            DropRock(); // New function for dropping the rock with the space key
+        }
+    }
+
+    void RotateRock()
+    {
+        // Assuming the rock rotates around its local Y axis with the scroll wheel
+        float rotationAmount = Input.mouseScrollDelta.y * rotationSpeed;
+        // Rotate the rock. You need to get a reference to the rock's transform.
+        // For the sake of this example, I'm rotating the cylinder.
+        cylinderTransform.Rotate(0, rotationAmount, 0);
+    }
+
+    void DropRock()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            // Call a function from the rock's script to drop the rock.
+            // For this example, I'm setting rockInteractionActive to false.
+            SetRockInteractionActive(false);
         }
     }
 
@@ -85,6 +115,8 @@ public class CameraController : MonoBehaviour
 
     void HandleZoom()
     {
+        if (rockInteractionActive) return; // Avoid zooming when interacting with the rock
+
         targetFieldOfView -= Input.mouseScrollDelta.y * zoomSpeed;
         targetFieldOfView = Mathf.Clamp(targetFieldOfView, minFieldOfView, maxFieldOfView);
 
