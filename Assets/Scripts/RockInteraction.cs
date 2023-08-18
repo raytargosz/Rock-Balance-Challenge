@@ -20,6 +20,9 @@ public class RockInteraction : MonoBehaviour
     [Tooltip("Speed of rotation using the mouse wheel.")]
     public float rotateSpeedMouseWheel = 20f;
 
+    [Tooltip("Effect of environmental forces on rock, e.g., wind.")]
+    public Vector3 environmentalForces = new Vector3(0, 0, 0);
+
     [Header("Camera Settings")]
     [Tooltip("Speed of camera rotation around the rock using Q/E keys.")]
     public float cameraRotationSpeed = 30f;  // Adjust the default value as needed
@@ -76,16 +79,14 @@ public class RockInteraction : MonoBehaviour
         Vector3 movement = new Vector3(0, 0, 0);
 
         if (Input.GetKey(KeyCode.W))
-        {
-            movement += Vector3.up; // Was previously Vector3.down
-        }
+            movement += Vector3.up;
         else if (Input.GetKey(KeyCode.S))
-        {
-            movement += Vector3.down; // Was previously Vector3.up
-        }
+            movement += Vector3.down;
+
         if (isHeld)
         {
             rb.isKinematic = true;
+            rb.AddForce(environmentalForces);
         }
 
         transform.Translate(movement * moveSpeed * Time.deltaTime);

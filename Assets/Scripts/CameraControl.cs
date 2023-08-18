@@ -16,6 +16,11 @@ public class CameraController : MonoBehaviour
     private Vector3 lastMousePosition;
     private Vector3 currentRotationVelocity;
 
+    [Header("Cinematic Effects")]
+    public bool isCinematicSequence = false;
+    public Transform focusTarget;
+    public float cinematicLookAtSpeed = 1.0f;
+
     [Header("Camera Movement Restrictions")]
     public float maxDistanceFromCylinder = 10f;  // Maximum distance from the cylinder's center
     public float minDistanceFromCylinder = 2f;   // Minimum distance from the cylinder's center
@@ -53,14 +58,30 @@ public class CameraController : MonoBehaviour
         HandleAudio();
         HandleKeyboardMovement();
 
-        if (rockInteractionActive)
+        if (isCinematicSequence)
         {
-            HandleRockInteraction();
+            HandleCinematicCamera();
         }
         else
         {
-            HandleRotation();
-            HandleZoom();
+            if (rockInteractionActive)
+            {
+                HandleRockInteraction();
+            }
+            else
+            {
+                HandleRotation();
+                HandleZoom();
+            }
+        }
+    }
+    private void HandleCinematicCamera()
+    {
+        if (focusTarget != null)
+        {
+            Vector3 relativePos = focusTarget.position - transform.position;
+            Quaternion rotation = Quaternion.LookRotation(relativePos);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rotation, cinematicLookAtSpeed * Time.deltaTime);
         }
     }
 
