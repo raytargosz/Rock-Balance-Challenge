@@ -1,17 +1,35 @@
 using UnityEngine;
+using System.Collections;
 
 public class RockStacking : MonoBehaviour
 {
-    public GameObject[] stones; // Array of available stone prefabs
-    private GameObject selectedStone;
+    public AudioSource audioSource;
+    public AudioClip placeSound;
+    public AudioClip unstableSound;
+    public ParticleSystem dustEffect;
+    public GameObject[] stones;
 
+    private GameObject selectedStone;
+    private Camera mainCamera;
     private float rotationSpeed = 50f;
+    private float currentDistance;
+    private bool isRotating = false;
+
+    private void Awake()
+    {
+        mainCamera = Camera.main;  // Assumes you have only one camera in the scene tagged as "MainCamera"
+    }
 
     private void Update()
     {
         StoneSelection();
         PlaceStone();
-        RotateStone();
+
+        if (selectedStone != null)
+        {
+            MoveStone();
+            RotateStone();
+        }
     }
 
     void StoneSelection()
@@ -27,32 +45,50 @@ public class RockStacking : MonoBehaviour
         selectedStone = Instantiate(stones[index], new Vector3(0, 5, 0), Quaternion.identity);
     }
 
+    void MoveStone()
+    {
+        if (!isRotating)
+        {
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = currentDistance;
+            Vector3 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
+            selectedStone.transform.position = worldPos;
+        }
+    }
+
     void RotateStone()
     {
-        if (selectedStone == null)
-            return;
-
-        // Rotate the stone using W/A/S/D and Q/E
-        float horizontalRotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
-        float verticalRotation = Input.GetAxis("Vertical") * rotationSpeed * Time.deltaTime;
-
-        selectedStone.transform.Rotate(Vector3.up, horizontalRotation);
-        selectedStone.transform.Rotate(Vector3.right, verticalRotation);
-
-        // Tilt the stone with Q and E
-        if (Input.GetKey(KeyCode.Q))
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            selectedStone.transform.Rotate(Vector3.forward, rotationSpeed * Time.deltaTime);
+            isRotating = true;
+            float rotationX = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+            float rotationY = Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
+            selectedStone.transform.Rotate(Vector3.up, rotationX);
+            selectedStone.transform.Rotate(Vector3.right, rotationY);
         }
-        if (Input.GetKey(KeyCode.E))
+        else
         {
-            selectedStone.transform.Rotate(Vector3.forward, -rotationSpeed * Time.deltaTime);
-        }
+            isRotating = false;
 
-        // Reset stone's orientation with R
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            selectedStone.transform.rotation = Quaternion.identity;
+            float horizontalRotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
+            float verticalRotation = Input.GetAxis("Vertical") * rotationSpeed * Time.deltaTime;
+
+            selectedStone.transform.Rotate(Vector3.up, horizontalRotation);
+            selectedStone.transform.Rotate(Vector3.right, verticalRotation);
+
+            if (Input.GetKey(KeyCode.Q))
+            {
+                selectedStone.transform.Rotate(Vector3.forward, rotationSpeed * Time.deltaTime);
+            }
+            if (Input.GetKey(KeyCode.E))
+            {
+                selectedStone.transform.Rotate(Vector3.forward, -rotationSpeed * Time.deltaTime);
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                selectedStone.transform.rotation = Quaternion.identity;
+            }
         }
     }
 
@@ -61,23 +97,68 @@ public class RockStacking : MonoBehaviour
         // Place the stone on left mouse click
         if (Input.GetMouseButtonDown(0) && selectedStone != null)
         {
-            // Here, you might want to do a physics check to make sure the stone is stable.
-            // If it's unstable, you might shake it, play a sound effect, etc.
+            if (IsStoneStable(selectedStone))
+            {
+                // Play sound effect for successful placement
+                audioSource.PlayOneShot(placeSound);
 
-            selectedStone = null; // Unselect the stone
+                // Play a visual effect (e.g., a small dust cloud) at the stone's base
+                dustEffect.transform.position = selectedStone.transform.position;
+                dustEffect.Play();
+
+                selectedStone = null; // Unselect the stone
+            }
+            else
+            {
+                // Indicate that the stone is unstable. This could be a shake effect, a sound, etc.
+                StartCoroutine(ShakeStone(selectedStone));
+                audioSource.PlayOneShot(unstableSound);
+            }
         }
 
-        // Cancel stone placement on right mouse click
-        if (Input.GetMouseButtonDown(1))
+        bool IsStoneStable(GameObject stone)
         {
-            Destroy(selectedStone);
-            selectedStone = null;
+            // Check if stone's vertical velocity is close to zero
+            Rigidbody stoneRb = stone.GetComponent<Rigidbody>();
+            if (Mathf.Abs(stoneRb.velocity.y) > 0.1f) return false;
+
+            // Check if stone is making contact with another stone below it
+            RaycastHit hit;
+            if (Physics.Raycast(stone.transform.position, Vector3.down, out hit))
+            {
+                if (hit.collider.CompareTag("Stone")) return true;
+            }
+
+            return false;
+        }
+
+        IEnumerator ShakeStone(GameObject stone)
+        {
+            Vector3 originalPosition = stone.transform.position;
+            float shakeAmount = 0.5f;
+            float shakeDuration = 0.5f;
+
+            for (float elapsed = 0; elapsed < shakeDuration; elapsed += Time.deltaTime)
+            {
+                // Check if the stone object is still valid
+                if (stone == null) yield break;
+
+                float xOffset = Random.Range(-shakeAmount, shakeAmount);
+                float zOffset = Random.Range(-shakeAmount, shakeAmount);
+                stone.transform.position = new Vector3(originalPosition.x + xOffset, originalPosition.y, originalPosition.z + zOffset);
+                yield return null;
+            }
+
+            // Again, check if the stone object is still valid before setting its position
+            if (stone != null)
+            {
+                stone.transform.position = originalPosition;
+            }
         }
     }
 
-    // This is a very simple version. You'd also want functions to:
-    // - Check the stability of the stack.
-    // - Add sounds, effects, etc.
-    // - Handle scoring.
-    // - Possibly interact with other systems like leaderboards, challenges, etc.
+        // - Check the stability of the stack.
+        // - Add sounds, effects, etc.
+        // - Handle scoring.
+        // - Possibly interact with other systems like leaderboards, challenges, etc.
 }

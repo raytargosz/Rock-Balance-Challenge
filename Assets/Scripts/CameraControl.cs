@@ -1,80 +1,130 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
+[Tooltip("Handles camera controls around the rock.")]
 public class CameraController : MonoBehaviour
 {
     private Camera cam;
     private AudioSource audioSource;
 
+    // References
     [Header("References")]
+    [Tooltip("Transform of the cylinder or rock that the camera interacts with.")]
     public Transform cylinderTransform;
 
+    // Camera Rotation
     [Header("Camera Rotation")]
+    [Tooltip("Speed of the camera's rotation.")]
     public float rotationSpeed = 3f;
+    [Tooltip("Smoothness of the rotation drag effect.")]
     public float dragSmoothing = 10f;
+    [Tooltip("Duration for which the camera maintains rotation momentum.")]
     public float momentumDuration = 2f;
     private float currentMomentumDuration;
     private Vector3 lastMousePosition;
     private Vector3 currentRotationVelocity;
 
+    // Cinematic Effects
     [Header("Cinematic Effects")]
+    [Tooltip("Whether the camera is in a cinematic sequence.")]
     public bool isCinematicSequence = false;
+    [Tooltip("Target the camera focuses on during the cinematic sequence.")]
     public Transform focusTarget;
+    [Tooltip("Speed at which the camera looks at its focus target.")]
     public float cinematicLookAtSpeed = 1.0f;
 
+    // Camera Movement Restrictions
     [Header("Camera Movement Restrictions")]
-    public float maxDistanceFromCylinder = 10f;  // Maximum distance from the cylinder's center
-    public float minDistanceFromCylinder = 2f;   // Minimum distance from the cylinder's center
+    [Tooltip("Maximum distance the camera can be from the cylinder's center.")]
+    public float maxDistanceFromCylinder = 10f;
+    [Tooltip("Minimum distance the camera can be from the cylinder's center.")]
+    public float minDistanceFromCylinder = 2f;
 
+    // Keyboard Movement
     [Header("Keyboard Movement")]
+    [Tooltip("Speed of camera movement when using the keyboard.")]
     public float keyboardMovementSpeed = 5f;
+    [Tooltip("Whether the camera is currently interacting with a rock.")]
     public bool rockInteractionActive = false;
 
+    // Camera Zoom
     [Header("Camera Zoom")]
+    [Tooltip("Default field of view for the camera.")]
     [Range(30, 120)] public float defaultFieldOfView = 60f;
+    [Tooltip("Minimum field of view for the camera.")]
     [Range(30, 120)] public float minFieldOfView = 30f;
+    [Tooltip("Maximum field of view for the camera.")]
     [Range(30, 120)] public float maxFieldOfView = 90f;
+    [Tooltip("Speed at which the camera zooms in and out.")]
     public float zoomSpeed = 10f;
     private float targetFieldOfView;
 
+    [Header("Camera Settings")]
+    [Tooltip("Speed of camera rotation around the rock using Q/E keys.")]
+    public float cameraRotationSpeed = 30f;  // Adjust the default value as needed
+
+    private Transform rockTransform;  // Rock's transform
+
+    // Sound Effects
     [Header("Sound Effects")]
+    [Tooltip("Sound effect when the camera zooms in.")]
     public AudioClip zoomInSound;
+    [Tooltip("Sound effect when the camera zooms out.")]
     public AudioClip zoomOutSound;
+    [Tooltip("Sound effect when the camera moves up.")]
     public AudioClip moveUpSound;
+    [Tooltip("Sound effect when the camera moves down.")]
     public AudioClip moveDownSound;
+    [Tooltip("Sound effect when the camera moves to the left.")]
     public AudioClip moveLeftSound;
+    [Tooltip("Sound effect when the camera moves to the right.")]
     public AudioClip moveRightSound;
+    [Tooltip("Cooldown duration between playing sounds.")]
     public float soundCooldown = 0.5f;
     private float zoomSoundCooldown;
     private float moveSoundCooldown;
+    [Tooltip("Range for randomizing the pitch of the sound effects.")]
     public Vector2 pitchRange = new Vector2(0.8f, 1.2f);
 
     private void Start()
     {
-        InitializeComponents();
+        rockTransform = FindObjectOfType<RockInteraction>().transform;
     }
 
-    private void Update()
+    void Update()
     {
-        HandleAudio();
-        HandleKeyboardMovement();
+        HandleCameraRotation();
+    }
 
-        if (isCinematicSequence)
+    void HandleCameraRotation()
+    {
+        if (Input.GetKey(KeyCode.Q))
         {
-            HandleCinematicCamera();
+            transform.RotateAround(rockTransform.position, Vector3.up, -cameraRotationSpeed * Time.deltaTime);
         }
-        else
+        else if (Input.GetKey(KeyCode.E))
         {
-            if (rockInteractionActive)
+            transform.RotateAround(rockTransform.position, Vector3.up, cameraRotationSpeed * Time.deltaTime);
+        }
+    }
+
+    private void HandleRockPickup()
+    {
+        if (Input.GetMouseButtonDown(0))  // Check if the left mouse button is clicked.
+        {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            // Raycast and check if it hits a rock object.
+            if (Physics.Raycast(ray, out hit) && hit.transform.CompareTag("Rock"))  // Assuming your rocks have the tag "Rock".
             {
-                HandleRockInteraction();
-            }
-            else
-            {
-                HandleRotation();
-                HandleZoom();
+                SetRockInteractionActive(true);
+                cylinderTransform = hit.transform;  // Assign the hit rock to the cylinderTransform for interaction.
             }
         }
     }
+
+
     private void HandleCinematicCamera()
     {
         if (focusTarget != null)
@@ -136,7 +186,7 @@ public class CameraController : MonoBehaviour
         transform.RotateAround(cylinderTransform.position, transform.right, deltaPitch);
 
         lastMousePosition = Input.mousePosition;
-        currentMomentumDuration = momentumDuration;
+        currentMomentumDuration = momentumDuration; 
         currentRotationVelocity = deltaMousePos;
     }
 

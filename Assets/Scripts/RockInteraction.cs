@@ -51,6 +51,17 @@ public class RockInteraction : MonoBehaviour
 
     void Update()
     {
+        CheckForPickupDrop();
+
+        if (isStonePicked)
+        {
+            HandleStoneMovement();
+            HandleStoneRotation();
+        }
+    }
+
+    private void CheckForPickupDrop()
+    {
         // Check for stone pickup/drop
         if (Input.GetMouseButtonDown(0) && !isStonePicked && IsStoneUnderCursor())
         {
@@ -61,16 +72,6 @@ public class RockInteraction : MonoBehaviour
         {
             ReleaseRock();
             isStonePicked = false;
-        }
-
-        if (isStonePicked)
-        {
-            HandleStoneMovement();
-            HandleStoneRotation();
-        }
-        else
-        {
-            HandleCameraRotation();
         }
     }
 
@@ -128,7 +129,6 @@ public class RockInteraction : MonoBehaviour
 
         return false;
     }
-
 
     void HandleCameraRotation()
     {
